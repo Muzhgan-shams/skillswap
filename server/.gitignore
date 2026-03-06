@@ -21,3 +21,4 @@ Thumbs.db
 # Editor folders
 .vscode/*
 !.vscode/extensions.json
+/src/generated/prisma
