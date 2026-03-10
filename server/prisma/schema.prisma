@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -8,21 +8,27 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
-  email     String    @unique
-  password  String
-  bio       String?
-  city      String?
-  avatarUrl String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  username         String    @unique
+  email            String    @unique
+  password         String
+  bio              String?
+  city             String?
+  avatarUrl        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
   // Relations - in prisma it is two ways
-  listings  Listing[] // "an array of" - one user can have many listings
+  listings         Listing[] // "an array of" - one user can have many listings
+  sentRequests     Request[] @relation("requester")
+  receivedRequests Request[] @relation("owner")
+  givenReviews     Review[]  @relation("reviewer")
+  receivedReviews  Review[]  @relation("reviewee")
+  sentMessages     Message[] @relation("sender")
+  receivedMessages Message[] @relation("receiver")
 }
 
 model Listing {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   userId       Int
   title        String
   description  String
@@ -30,9 +36,67 @@ model Listing {
   skillOffered String
   skillWanted  String
   hours        Int
-  isAvailable  Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isAvailable  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   //Relations - in prisma it is two way
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requests     Request[]
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model Request {
+  id          Int           @id @default(autoincrement())
+  listingId   Int
+  requesterId Int
+  ownerId     Int
+  status      RequestStatus @default(PENDING)
+  message     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  listing   Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  requester User      @relation("requester", fields: [requesterId], references: [id])
+  owner     User      @relation("owner", fields: [ownerId], references: [id]) // named relation - cause the request model points to user twice
+  reviews   Review[]
+  messages  Message[]
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  requestId   Int
+  reviewerId  Int
+  revieweeId  Int
+  title       String?
+  description String
+  rating      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  request  Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reviewer User    @relation("reviewer", fields: [reviewerId], references: [id])
+  reviewee User    @relation("reviewee", fields: [revieweeId], references: [id])
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  requestId  Int
+  senderId   Int
+  receiverId Int
+  content    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  request  Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  sender   User    @relation("sender", fields: [senderId], references: [id])
+  receiver User    @relation("receiver", fields: [receiverId], references: [id])
 }
