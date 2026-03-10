@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -9,13 +8,31 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
   password  String
   bio       String?
   city      String?
   avatarUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // Relations - in prisma it is two ways
+  listings  Listing[] // "an array of" - one user can have many listings
+}
+
+model Listing {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  title        String
+  description  String
+  category     String
+  skillOffered String
+  skillWanted  String
+  hours        Int
+  isAvailable  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  //Relations - in prisma it is two way
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
