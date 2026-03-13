@@ -31,7 +31,7 @@ export const createListingSchema = z.object({
 });
 
 export const updateListingSchema = createListingSchema.partial().extend({
-  isAvailable: z.boolean().optional(),
+  isAvailable: z.boolean().optional(), // takes create fields and makes them optional, then adds isAvailable as an optional field
 });
 
 export type CreateListingInput = z.infer<typeof createListingSchema>;
