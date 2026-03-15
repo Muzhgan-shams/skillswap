@@ -16,7 +16,7 @@ app.use(express.json());
 app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ status: "Server is healthy!" });
 });
-app.use("api/users", userRoutes);
+app.use("/api/users", userRoutes);
 
 // Start the server
 app.listen(PORT, () => {
