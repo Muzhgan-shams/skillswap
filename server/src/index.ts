@@ -2,6 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import userRoutes from "./routes/user.routes";
 
 dotenv.config({ quiet: true });
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ status: "Server is healthy!" });
 });
+app.use("api/users", userRoutes);
 
 // Start the server
 app.listen(PORT, () => {
