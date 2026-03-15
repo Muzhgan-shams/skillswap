@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "commonjs", // tell TS to compile import/export to require/module.exports
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node", //without this ts explicit files extensions in imports
+    "resolveJsonModule": true //allows importing json files directly
   },
-  "exclude":[
+  "exclude": [
     "node_modules",
     "dist",
     "prisma.config.ts"
