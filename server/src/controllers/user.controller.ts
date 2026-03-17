@@ -1,9 +1,9 @@
+import { env } from "../config/env";
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt"; // password hashing
 import prisma from "../lib/prisma"; // Prisma client instance
 import { LoginInput, RegisterInput } from "../validators/user.validator"; // type for registration input
 import jwt, { SignOptions } from "jsonwebtoken";
-import "dotenv/config";
 
 // User Registration
 export const registerUser = async (
@@ -77,8 +77,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   const token = jwt.sign(
     { userId: user.id, email: user.email },
-    process.env.JWT_SECRET as string,
-    { expiresIn: process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] },
+    env.JWT_SECRET,
+    { expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"] },
   );
   res.status(200).json({
     success: true,

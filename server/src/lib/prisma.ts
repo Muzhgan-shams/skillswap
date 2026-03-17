@@ -1,10 +1,10 @@
-// singleton prisma client instance to be used across the app
-import "dotenv/config"; // to run before prisma
+/* * singleton prisma client instance to be used across the app*/
+import { env } from "../config/env"; // loads and validates env vars before Prisma client initializes
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL as string,
+  connectionString: env.DATABASE_URL,
 });
 const prisma = new PrismaClient({ adapter });
 export default prisma;
