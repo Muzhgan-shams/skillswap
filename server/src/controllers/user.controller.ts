@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt"; // password hashing
 import prisma from "../lib/prisma"; // Prisma client instance
-import { RegisterInput } from "../validators/user.validator"; // type for registration input
-import { success } from "zod";
+import { LoginInput, RegisterInput } from "../validators/user.validator"; // type for registration input
+import jwt, { SignOptions } from "jsonwebtoken";
+import "dotenv/config";
 
+// User Registration
 export const registerUser = async (
   // DB operations take time, so we use async/await
   req: Request,
@@ -47,5 +49,47 @@ export const registerUser = async (
     success: true,
     message: "User registered successfully",
     data: user,
+  });
+};
+
+// User Login
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body as LoginInput;
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid email or password",
+    });
+    return;
+  }
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid email or password",
+    });
+    return;
+  }
+
+  const token = jwt.sign(
+    { userId: user.id, email: user.email },
+    process.env.JWT_SECRET as string,
+    { expiresIn: process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] },
+  );
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    token,
+    data: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      city: user.city,
+    },
   });
 };
