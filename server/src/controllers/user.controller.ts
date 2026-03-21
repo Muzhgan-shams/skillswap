@@ -93,3 +93,31 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     },
   });
 };
+
+// getMe
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.userId },
+    select: {
+      // what fields to return
+      id: true,
+      username: true,
+      email: true,
+      bio: true,
+      city: true,
+      avatarUrl: true,
+      createdAt: true,
+    },
+  });
+  if (!user) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+    return;
+  }
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+};
