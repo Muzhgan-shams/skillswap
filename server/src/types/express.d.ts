@@ -1,3 +1,4 @@
+/** d.ts - typescript declaration file*/
 import "express";
 
 declare module "express" {
