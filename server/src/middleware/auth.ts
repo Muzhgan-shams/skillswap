@@ -21,8 +21,16 @@ export const authenticate = (
     return;
   }
   const tokem = authHeader.split(" ")[1]; //  splits 'Bearer eyJhbGci...' by the space and takes the second part — just the token itself.
-  const decoded = jwt.verify(tokem, env.JWT_SECRET) as JwtPayload;
-  req.userId = decoded.userId; // attaches userId to the request, every controller after this middleware can read req.userId
-  req.userEmail = decoded.email;
-  next();
+  try {
+    const decoded = jwt.verify(tokem, env.JWT_SECRET) as JwtPayload;
+    req.userId = decoded.userId; // attaches userId to the request, every controller after this middleware can read req.userId
+    req.userEmail = decoded.email;
+    next();
+  } catch {
+    // generic invalid response
+    res.status(401).json({
+      success: false,
+      message: "Invalid or expired token.",
+    });
+  }
 };
