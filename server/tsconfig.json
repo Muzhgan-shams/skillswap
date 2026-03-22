@@ -8,7 +8,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node", //without this ts explicit files extensions in imports
-    "resolveJsonModule": true //allows importing json files directly
+    "resolveJsonModule": true, //allows importing json files directly
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "exclude": [
     "node_modules",
