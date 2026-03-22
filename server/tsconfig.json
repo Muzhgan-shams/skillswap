@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "moduleResolution": "node", //without this ts explicit files extensions in imports
     "resolveJsonModule": true, //allows importing json files directly
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "typeRoots": ["./src/types", "./node_modules/@types"] // tells TS which folder contains type declarations
   },
   "exclude": [
     "node_modules",

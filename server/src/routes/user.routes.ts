@@ -12,7 +12,7 @@ router.post("/register", validate(registerSchema), registerUser);
 // POST /api/users/login
 router.post("/login", validate(loginSchema), loginUser);
 
-/* Private Routes */
+/* Private Routes - token required */
 router.get("/me", authenticate, getMe);
 
 export default router;
