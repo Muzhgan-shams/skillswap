@@ -2,6 +2,13 @@ import type { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { CreateListingInput } from "../validators/listing.validator";
 
+// All Listings
+export const getAllListings = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
+
+// Create Listings
 export const createListing = async (
   req: Request,
   res: Response,
