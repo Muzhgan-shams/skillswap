@@ -75,6 +75,8 @@ export const getAllListings = async (
   });
 };
 
+// Single Listing
+export const getListingById = async (): Promise<void> => {};
 // Create Listings
 export const createListing = async (
   req: Request,
