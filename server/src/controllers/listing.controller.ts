@@ -76,7 +76,62 @@ export const getAllListings = async (
 };
 
 // Single Listing
-export const getListingById = async (): Promise<void> => {};
+export const getListingById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid listing ID",
+    });
+    return;
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      category: true,
+      skillOffered: true,
+      skillWanted: true,
+      hours: true,
+      isAvailable: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          bio: true,
+          city: true,
+          avatarUrl: true,
+        },
+      },
+      requests: {
+        select: {
+          id: true,
+          status: true,
+        },
+      },
+    },
+  });
+  if (!listing) {
+    res.status(404).json({
+      success: false,
+      message: "Listing not found",
+    });
+    return;
+  }
+  res.status(200).json({
+    success: true,
+    data: listing,
+  });
+};
 // Create Listings
 export const createListing = async (
   req: Request,
