@@ -182,4 +182,51 @@ export const createListing = async (
 export const updateListing = async (
   req: Request,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid listing ID",
+    });
+    return;
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+  });
+
+  if (!listing) {
+    res.status(404).json({ success: false, message: "Listing not found" });
+    return;
+  }
+  if (listing.userId !== req.userId) {
+    res.status(403).json({
+      // 403 - Forbidden
+      success: false,
+      message: "You can only update your own listings",
+    });
+    return;
+  }
+  const updated = await prisma.listing.update({
+    where: { id },
+    data: req.body,
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      category: true,
+      skillOffered: true,
+      skillWanted: true,
+      hours: true,
+      isAvailable: true,
+      updatedAt: true,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Listing updated successfully",
+    data: updated,
+  });
+};
