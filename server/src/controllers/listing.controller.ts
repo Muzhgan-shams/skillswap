@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { CreateListingInput } from "../validators/listing.validator";
+import { REPLCommand } from "node:repl";
 
 // All Listings
 export const getAllListings = async (
@@ -176,3 +177,9 @@ export const createListing = async (
     data: listing,
   });
 };
+
+// Update Listing
+export const updateListing = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
