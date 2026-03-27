@@ -7,6 +7,7 @@ import {
 } from "../validators/listing.validator";
 import {
   createListing,
+  deleteListing,
   getAllListings,
   getListingById,
   updateListing,
@@ -21,6 +22,7 @@ router.get("/:id", getListingById);
 /* Listing Protected Route - token required */
 router.post("/", authenticate, validate(createListingSchema), createListing);
 router.put("/:id", authenticate, validate(updateListingSchema), updateListing);
+router.delete("/:id", authenticate, deleteListing);
 
 export default router;
 

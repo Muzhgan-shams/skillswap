@@ -230,3 +230,9 @@ export const updateListing = async (
     data: updated,
   });
 };
+
+// Delete Listing
+export const deleteListing = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
