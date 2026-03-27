@@ -235,4 +235,43 @@ export const updateListing = async (
 export const deleteListing = async (
   req: Request,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid listing ID",
+    });
+    return;
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+  });
+
+  if (!listing) {
+    res.status(404).json({
+      success: false,
+      message: "Listing not found",
+    });
+    return;
+  }
+
+  if (listing.userId !== req.userId) {
+    res.status(403).json({
+      success: false,
+      message: "You can only delete your own listings",
+    });
+    return;
+  }
+
+  await prisma.listing.delete({
+    where: { id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Listing deleted successfully",
+  });
+};
