@@ -208,6 +208,14 @@ export const updateListing = async (
     });
     return;
   }
+
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).json({
+      success: false,
+      message: "No valid fields provided for update",
+    });
+    return;
+  }
   const updated = await prisma.listing.update({
     where: { id },
     data: req.body,
