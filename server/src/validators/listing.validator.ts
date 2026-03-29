@@ -15,6 +15,7 @@ export const createListingSchema = z.object({
       "Fitness",
       "Art",
       "Business",
+      "Education",
       "Other",
     ],
     { error: "Please select a valid category" },
