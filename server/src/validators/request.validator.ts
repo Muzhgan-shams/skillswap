@@ -8,4 +8,11 @@ export const createRequestSchema = z.object({
     .optional(),
 });
 
+export const updateRequestSchema = z.object({
+  status: z.enum(["ACCEPTED", "REJECTED", "COMPLETED"], {
+    error: "Status must be ACCEPTED, REJECTED or COMPLETED",
+  }),
+});
+
 export type CreateRequestInput = z.infer<typeof createRequestSchema>;
+export type UpdateRequestInput = z.infer<typeof updateRequestSchema>;
