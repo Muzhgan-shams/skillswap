@@ -95,4 +95,50 @@ export const createRequest = async (
 export const getMyRequests = async (
   req: Request,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => {
+  const { role = "requester" } = req.query as { role?: string };
+
+  const where =
+    role === "owner"
+      ? { ownerId: req.userId as number }
+      : { requesterId: req.userId as number };
+
+  const requests = await prisma.request.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      status: true,
+      message: true,
+      createdAt: true,
+      updatedAt: true,
+      listing: {
+        select: {
+          id: true,
+          title: true,
+          skillOffered: true,
+          skillWanted: true,
+        },
+      },
+      requester: {
+        select: {
+          id: true,
+          username: true,
+          city: true,
+        },
+      },
+      owner: {
+        select: {
+          id: true,
+          username: true,
+          city: true,
+        },
+      },
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    data: requests,
+  });
+};
