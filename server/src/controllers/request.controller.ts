@@ -91,3 +91,8 @@ export const createRequest = async (
     data: request,
   });
 };
+
+export const getMyRequests = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
