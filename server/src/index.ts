@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
 import listingRoutes from "./routes/listing.routes";
+import requestRoutes from "./routes/request.routes";
 
 const app = express();
 const PORT = env.PORT;
@@ -18,6 +19,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 app.use("/api/users", userRoutes);
 app.use("/api/listings", listingRoutes);
+app.use("/api/requests", requestRoutes);
 
 // Start the server
 app.listen(PORT, () => {
