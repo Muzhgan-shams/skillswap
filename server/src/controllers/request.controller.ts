@@ -146,4 +146,45 @@ export const getMyRequests = async (
 export const updateRequest = async (
   req: Request,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+  const { status } = req.body as UpdateRequestInput;
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid request ID",
+    });
+    return;
+  }
+  const request = await prisma.request.findUnique({
+    where: { id },
+  });
+  if (!request) {
+    res.status(404).json({
+      success: false,
+      message: "Request not found",
+    });
+    return;
+  }
+  if (request.ownerId !== req.userId) {
+    res.status(403).json({
+      success: false,
+      message: "Only the listing owner can update request status",
+    });
+    return;
+  }
+  const updated = await prisma.request.update({
+    where: { id },
+    data: { status },
+    select: {
+      id: true,
+      status: true,
+      updatedAt: true,
+    },
+  });
+  res.status(200).json({
+    success: true,
+    message: `Request ${status.toLowerCase()} successfully`,
+    data: updated,
+  });
+};
