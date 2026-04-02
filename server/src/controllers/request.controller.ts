@@ -192,4 +192,43 @@ export const updateRequest = async (
 export const deleteRequest = async (
   req: Request,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid request ID",
+    });
+    return;
+  }
+  const request = await prisma.request.findUnique({
+    where: { id },
+  });
+  if (!request) {
+    res.status(404).json({
+      success: false,
+      message: "Request not found",
+    });
+    return;
+  }
+  if (request.requesterId !== req.userId) {
+    res.status(403).json({
+      success: false,
+      message: "You can only cancel your own requests",
+    });
+    return;
+  }
+  if (request.status !== "PENDING") {
+    res.status(400).json({
+      success: false,
+      message: "You can only cancel pending requests",
+    });
+    return;
+  }
+  await prisma.request.delete({ where: { id } });
+
+  res.status(200).json({
+    success: true,
+    message: "Request cancelled successfully",
+  });
+};
