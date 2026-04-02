@@ -188,3 +188,8 @@ export const updateRequest = async (
     data: updated,
   });
 };
+
+export const deleteRequest = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
