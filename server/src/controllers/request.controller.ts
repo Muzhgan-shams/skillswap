@@ -142,3 +142,8 @@ export const getMyRequests = async (
     data: requests,
   });
 };
+
+export const updateRequest = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {};
