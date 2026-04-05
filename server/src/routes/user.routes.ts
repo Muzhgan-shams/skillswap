@@ -1,7 +1,16 @@
 import { Router } from "express";
-import { getMe, loginUser, registerUser } from "../controllers/user.controller";
+import {
+  getMe,
+  loginUser,
+  registerUser,
+  updateProfile,
+} from "../controllers/user.controller";
 import { validate } from "../middleware/validate";
-import { loginSchema, registerSchema } from "../validators/user.validator";
+import {
+  loginSchema,
+  registerSchema,
+  updateProfileSchema,
+} from "../validators/user.validator";
 import { authenticate } from "../middleware/auth";
 
 const router = Router();
@@ -14,5 +23,6 @@ router.post("/login", validate(loginSchema), loginUser);
 
 /* Private Routes - token required */
 router.get("/me", authenticate, getMe);
+router.put("/me", authenticate, validate(updateProfileSchema), updateProfile);
 
 export default router;
