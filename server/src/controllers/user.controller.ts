@@ -2,7 +2,11 @@ import { env } from "../config/env";
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt"; // password hashing
 import prisma from "../lib/prisma"; // Prisma client instance
-import { LoginInput, RegisterInput } from "../validators/user.validator"; // type for registration input
+import {
+  LoginInput,
+  RegisterInput,
+  UpdateProfileInput,
+} from "../validators/user.validator"; // type for registration input
 import jwt, { SignOptions } from "jsonwebtoken";
 
 // User Registration
@@ -118,6 +122,58 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
   }
   res.status(200).json({
     success: true,
+    data: user,
+  });
+};
+
+// Update Profile
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { username, bio, city } = req.body as UpdateProfileInput;
+
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).json({
+      success: false,
+      message: "No fields provided for update",
+    });
+    return;
+  }
+  if (username) {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        username,
+        NOT: { id: req.userId },
+      },
+    });
+
+    if (existingUser) {
+      res.status(409).json({
+        success: false,
+        message: "Username already taken",
+      });
+      return;
+    }
+  }
+
+  const user = await prisma.user.update({
+    where: { id: req.userId as number }, // who to update
+    data: { username, bio, city }, // what to update
+    select: {
+      // what to return
+      id: true,
+      username: true,
+      email: true,
+      bio: true,
+      city: true,
+      avatarUrl: true,
+      createdAt: true,
+    },
+  });
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
     data: user,
   });
 };
