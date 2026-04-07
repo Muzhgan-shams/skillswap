@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs", // tell TS to compile import/export to require/module.exports
+    "module": "node16", 
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node", //without this ts explicit files extensions in imports
+    "moduleResolution": "node16", //without this ts explicit files extensions in imports
     "resolveJsonModule": true, //allows importing json files directly
     "typeRoots": ["./src/types", "./node_modules/@types"] // tells TS which folder contains type declarations
   },
