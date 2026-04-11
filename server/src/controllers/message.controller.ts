@@ -73,3 +73,63 @@ export const sendMessage = async (
     data: message,
   });
 };
+
+export const getMessages = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const requestId = parseInt(req.params.requestId as string);
+  if (isNaN(requestId)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid request ID",
+    });
+    return;
+  }
+
+  const swapRequest = await prisma.request.findUnique({
+    where: { id: requestId },
+  });
+  if (!swapRequest) {
+    res.status(404).json({
+      success: false,
+      message: "Request not found",
+    });
+    return;
+  }
+
+  const isParticipant =
+    swapRequest.requesterId === req.userId ||
+    swapRequest.ownerId === req.userId;
+
+  if (!isParticipant) {
+    res.status(403).json({
+      success: false,
+      message: "You are not part of this request",
+    });
+    return;
+  }
+
+  const messages = await prisma.message.findMany({
+    where: { requestId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      content: true,
+      isRead: true,
+      createdAt: true,
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          avatarUrl: true,
+        },
+      },
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    data: messages,
+  });
+};
