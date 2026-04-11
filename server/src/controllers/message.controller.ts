@@ -133,3 +133,54 @@ export const getMessages = async (
     data: messages,
   });
 };
+
+export const markAsRead = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const id = parseInt(req.params.id as string);
+
+  if (isNaN(id)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid message ID",
+    });
+    return;
+  }
+
+  const message = await prisma.message.findUnique({
+    where: { id },
+  });
+
+  if (!message) {
+    res.status(404).json({
+      success: false,
+      message: "Message not found",
+    });
+    return;
+  }
+
+  if (message.receiverId !== req.userId) {
+    res.status(403).json({
+      success: false,
+      message: "You can only mark your own messages as read",
+    });
+    return;
+  }
+
+  const updated = await prisma.message.update({
+    where: { id },
+    data: { isRead: true },
+    select: {
+      id: true,
+      isRead: true,
+      updatedAt: true,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Message marked as read",
+    data: updated,
+  });
+};
