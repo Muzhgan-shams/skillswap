@@ -174,7 +174,7 @@ export const markAsRead = async (
     select: {
       id: true,
       isRead: true,
-      updatedAt: true,
+      createdAt: true,
     },
   });
 
