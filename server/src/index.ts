@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.routes.js";
 import listingRoutes from "./routes/listing.routes.js";
 import requestRoutes from "./routes/request.routes.js";
 import messageRoutes from "./routes/message.routes.js";
+import reviewRoutes from "./routes/review.routes";
 
 const app = express();
 const PORT = env.PORT;
@@ -22,6 +23,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Start the server
 app.listen(PORT, () => {
