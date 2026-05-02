@@ -101,3 +101,63 @@ export const createReview = async (
     data: review,
   });
 };
+
+export const getUserReviews = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const userId = parseInt(req.params.userId as string);
+
+  if (isNaN(userId)) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid user ID",
+    });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+    return;
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: { revieweeId: userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      rating: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      reviewer: {
+        select: {
+          id: true,
+          username: true,
+          avatarUrl: true,
+        },
+      },
+    },
+  });
+
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      reviews,
+      averageRating: Math.round(averageRating * 10) / 10,
+      totalReviews: reviews.length,
+    },
+  });
+};
