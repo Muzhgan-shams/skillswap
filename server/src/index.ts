@@ -7,6 +7,7 @@ import listingRoutes from "./routes/listing.routes.js";
 import requestRoutes from "./routes/request.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import reviewRoutes from "./routes/review.routes";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const PORT = env.PORT;
@@ -24,6 +25,9 @@ app.use("/api/listings", listingRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {
