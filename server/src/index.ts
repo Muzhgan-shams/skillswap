@@ -26,6 +26,14 @@ app.use("/api/requests", requestRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
 
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
 // Error handling middleware
 app.use(errorHandler);
 
