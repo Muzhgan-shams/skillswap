@@ -8,172 +8,178 @@ import {
   UpdateProfileInput,
 } from "../validators/user.validator"; // type for registration input
 import jwt, { SignOptions } from "jsonwebtoken";
+import { catchAsync } from "../utils/catchAsync";
 
 // User Registration
-export const registerUser = async (
-  // DB operations take time, so we use async/await
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  const { username, email, password, bio, city } = req.body as RegisterInput;
+export const registerUser = catchAsync(
+  async (
+    // DB operations take time, so we use async/await
+    req: Request,
+    res: Response,
+  ): Promise<void> => {
+    const { username, email, password, bio, city } = req.body as RegisterInput;
 
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ email }, { username }],
-    },
-  });
-
-  if (existingUser) {
-    res.status(409).json({
-      success: false,
-      message: "Username or email already taken",
-    });
-    return;
-  }
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: {
-      username,
-      email,
-      password: hashedPassword,
-      bio,
-      city,
-    },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      city: true,
-      createdAt: true,
-    },
-  });
-
-  res.status(201).json({
-    success: true,
-    message: "User registered successfully",
-    data: user,
-  });
-};
-
-// User Login
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body as LoginInput;
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (!user) {
-    res.status(401).json({
-      success: false,
-      message: "Invalid email or password",
-    });
-    return;
-  }
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    res.status(401).json({
-      success: false,
-      message: "Invalid email or password",
-    });
-    return;
-  }
-
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    env.JWT_SECRET,
-    { expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"] },
-  );
-  res.status(200).json({
-    success: true,
-    message: "Login successful",
-    token,
-    data: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      bio: user.bio,
-      city: user.city,
-    },
-  });
-};
-
-// getMe
-export const getMe = async (req: Request, res: Response): Promise<void> => {
-  const user = await prisma.user.findUnique({
-    where: { id: req.userId },
-    select: {
-      // what fields to return
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      city: true,
-      avatarUrl: true,
-      createdAt: true,
-    },
-  });
-  if (!user) {
-    res.status(404).json({
-      success: false,
-      message: "User not found",
-    });
-    return;
-  }
-  res.status(200).json({
-    success: true,
-    data: user,
-  });
-};
-
-// Update Profile
-export const updateProfile = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  const { username, bio, city } = req.body as UpdateProfileInput;
-
-  if (Object.keys(req.body).length === 0) {
-    res.status(400).json({
-      success: false,
-      message: "No fields provided for update",
-    });
-    return;
-  }
-  if (username) {
     const existingUser = await prisma.user.findFirst({
       where: {
-        username,
-        NOT: { id: req.userId },
+        OR: [{ email }, { username }],
       },
     });
 
     if (existingUser) {
       res.status(409).json({
         success: false,
-        message: "Username already taken",
+        message: "Username or email already taken",
       });
       return;
     }
-  }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        bio,
+        city,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        bio: true,
+        city: true,
+        createdAt: true,
+      },
+    });
 
-  const user = await prisma.user.update({
-    where: { id: req.userId as number }, // who to update
-    data: { username, bio, city }, // what to update
-    select: {
-      // what to return
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      city: true,
-      avatarUrl: true,
-      createdAt: true,
-    },
-  });
-  res.status(200).json({
-    success: true,
-    message: "Profile updated successfully",
-    data: user,
-  });
-};
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: user,
+    });
+  },
+);
+
+// User Login
+export const loginUser = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const { email, password } = req.body as LoginInput;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+      return;
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+      return;
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      env.JWT_SECRET,
+      { expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"] },
+    );
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        city: user.city,
+      },
+    });
+  },
+);
+
+// getMe
+export const getMe = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: {
+        // what fields to return
+        id: true,
+        username: true,
+        email: true,
+        bio: true,
+        city: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  },
+);
+
+// Update Profile
+export const updateProfile = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const { username, bio, city } = req.body as UpdateProfileInput;
+
+    if (Object.keys(req.body).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No fields provided for update",
+      });
+      return;
+    }
+    if (username) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          username,
+          NOT: { id: req.userId },
+        },
+      });
+
+      if (existingUser) {
+        res.status(409).json({
+          success: false,
+          message: "Username already taken",
+        });
+        return;
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.userId as number }, // who to update
+      data: { username, bio, city }, // what to update
+      select: {
+        // what to return
+        id: true,
+        username: true,
+        email: true,
+        bio: true,
+        city: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: user,
+    });
+  },
+);
