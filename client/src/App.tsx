@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
 
 const App = () => {
   return (
@@ -12,24 +13,13 @@ const App = () => {
             </div>
           }
         />
-        <Route
-          path="/login"
-          element={
-            <div className="p-8 text-2xl font-bold text-blue-600">
-              Login Page
-            </div>
-          }
-        />
+        <Route path="/login" element={<LoginPage />} />
         <Route
           path="/register"
-          element={
-            <div className="p-8 text-2xl font-bold text-green-600">
-              Register Page
-            </div>
-          }
+          element={<div className="p-8 text-2xl font-bold">Register Page</div>}
         />
         <Route
-          path="*" /* the wildcard route, matches anyy URL that did not match anything above */
+          path="*"
           element={
             <div className="p-8 text-2xl font-bold text-red-600">
               404 — Page Not Found
